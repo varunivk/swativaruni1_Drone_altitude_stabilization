@@ -87,8 +87,7 @@ The following animation demonstrates how the drone altitude response changes whe
 
 | File Name | Description |
 |---|---|
-| create_drone_simulink.m | Automatically generates Simulink model |
-| drone_control.m | MATLAB analysis and graphs |
+| drone_control.m | MATLAB analysis and graphs|
 | Drone_Altitude_Control.slx | Simulink project file |
 | PID_Tuning_Visualization.gif | PID tuning animation |
 | video_demo.mp4 | Project demonstration video |

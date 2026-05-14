@@ -1,260 +1,145 @@
-% =========================================================
-% DRONE ALTITUDE STABILIZATION USING PID CONTROL
-% MATLAB + SIMULINK AUTO GENERATION
-% =========================================================
-
-clc;
-clear;
-close all;
-
-%% =========================================================
-% MODEL NAME
-%% =========================================================
-
-modelName = 'Drone_Altitude_Control7';
-
-%% =========================================================
-% CLOSE MODEL IF ALREADY OPEN
-%% =========================================================
-
-if bdIsLoaded(modelName)
-    close_system(modelName,0);
-end
-
-%% =========================================================
-% CREATE NEW SIMULINK MODEL
-%% =========================================================
-
-new_system(modelName);
-open_system(modelName);
-
-%% =========================================================
-% ADD BLOCKS
-%% =========================================================
-
-% STEP INPUT BLOCK
-add_block('simulink/Sources/Step', ...
-    [modelName '/Step Input'], ...
-    'Position',[30 100 60 130]);
-
-% ERROR SUMMATION BLOCK
-add_block('simulink/Math Operations/Sum', ...
-    [modelName '/Error Sum'], ...
-    'Inputs','+-', ...
-    'Position',[120 100 150 130]);
-
-% PID CONTROLLER BLOCK
-add_block('simulink/Continuous/PID Controller', ...
-    [modelName '/PID Controller'], ...
-    'P','42', ...
-    'I','24', ...
-    'D','18', ...
-    'Position',[220 85 340 145]);
-
-% WIND DISTURBANCE BLOCK
-add_block('simulink/Sources/Step', ...
-    [modelName '/Wind Disturbance'], ...
-    'Time','5', ...
-    'Before','0', ...
-    'After','1.5', ...
-    'Position',[250 220 280 250]);
-
-% DISTURBANCE SUM BLOCK
-add_block('simulink/Math Operations/Sum', ...
-    [modelName '/Disturbance Sum'], ...
-    'Inputs','++', ...
-    'Position',[400 100 430 130]);
-
-% TRANSFER FUNCTION BLOCK
-add_block('simulink/Continuous/Transfer Fcn', ...
-    [modelName '/Drone Dynamics'], ...
-    'Numerator','[1]', ...
-    'Denominator','[1 2 5]', ...
-    'Position',[500 85 650 145]);
-
-% SCOPE BLOCK
-add_block('simulink/Sinks/Scope', ...
-    [modelName '/Scope'], ...
-    'Position',[760 95 790 125]);
-
-%% =========================================================
-% SET PARAMETERS
-%% =========================================================
-
-% DESIRED ALTITUDE
-set_param([modelName '/Step Input'], ...
-    'Time','0', ...
-    'Before','0', ...
-    'After','10');
-
-% SIMULATION STOP TIME
-set_param(modelName,'StopTime','20');
+# 🚁 Drone Altitude Stabilization using PID Control
 
-%% =========================================================
-% CONNECT BLOCKS
-%% =========================================================
+## 📌 Project Overview
 
-% STEP INPUT TO ERROR SUM
-add_line(modelName, ...
-    'Step Input/1','Error Sum/1');
+This project implements a PID-based closed-loop control system for maintaining drone altitude under wind disturbance using MATLAB and Simulink.
 
-% ERROR SUM TO PID
-add_line(modelName, ...
-    'Error Sum/1','PID Controller/1');
+The controller continuously monitors altitude error and adjusts thrust to stabilize the drone even under external disturbances.
 
-% PID TO DISTURBANCE SUM
-add_line(modelName, ...
-    'PID Controller/1','Disturbance Sum/1');
+---
 
-% WIND DISTURBANCE CONNECTION
-add_line(modelName, ...
-    'Wind Disturbance/1','Disturbance Sum/2');
+# 🎯 Objectives
 
-% DISTURBANCE SUM TO DRONE
-add_line(modelName, ...
-    'Disturbance Sum/1','Drone Dynamics/1');
+- Maintain stable drone altitude
+- Minimize overshoot
+- Reduce settling time
+- Achieve near-zero steady-state error
+- Reject wind disturbance effectively
 
-% DRONE OUTPUT TO SCOPE
-add_line(modelName, ...
-    'Drone Dynamics/1','Scope/1');
+---
 
-% FEEDBACK CONNECTION
-add_line(modelName, ...
-    'Drone Dynamics/1','Error Sum/2', ...
-    'autorouting','on');
+# 🛠 Software Used
 
-%% =========================================================
-% SAVE MODEL
-%% =========================================================
+- MATLAB
+- Simulink
+- Control System Toolbox
 
-save_system(modelName);
+---
 
-%% =========================================================
-% RUN SIMULATION
-%% =========================================================
+# ⚙ Transfer Function
 
-simOut = sim(modelName);
+G(s) = 1 / (s² + 2s + 5)
 
-disp('=================================')
-disp('SIMULATION COMPLETED SUCCESSFULLY')
-disp('=================================')
+---
 
-%% =========================================================
-% CONTROL SYSTEM ANALYSIS
-%% =========================================================
+# 🧠 PID Controller
 
-% TRANSFER FUNCTION
-G = tf([1],[1 2 5]);
+The PID controller used is:
 
-% PID CONTROLLER
-C = pid(42,24,18);
+C(s) = Kp + Ki/s + Kd*s
 
-% CLOSED LOOP SYSTEM
-T = feedback(C*G,1);
+## PID Parameters
 
-%% =========================================================
-% STEP RESPONSE
-%% =========================================================
+| Parameter | Value |
+|---|---|
+| Kp | 42 |
+| Ki | 24 |
+| Kd | 18 |
 
-figure;
-step(T);
-grid on;
-title('Closed Loop Step Response');
+---
 
-%% =========================================================
-% PERFORMANCE METRICS
-%% =========================================================
+# 🧩 Features
 
-info = stepinfo(T);
+✅ Closed Loop Feedback Control  
+✅ PID Controller Implementation  
+✅ Wind Disturbance Rejection  
+✅ Automatic Simulink Generation using MATLAB Script  
+✅ Root Locus Analysis  
+✅ Bode Plot Analysis  
+✅ Stability Verification  
+✅ Performance Metrics Analysis
 
-disp(' ')
-disp('===== PERFORMANCE METRICS =====')
-disp(info)
+---
 
-%% =========================================================
-% DISTURBANCE ANALYSIS
-%% =========================================================
+# 🖼 Simulink Model
 
-t = 0:0.01:20;
+![Simulink Model](screenshots/simulink_model.png)
 
-u = ones(size(t));
+---
 
-d = zeros(size(t));
+# 📈 Step Response
 
-for i = 1:length(t)
+![Step Response](screenshots/step_response.png)
 
-    if t(i) >= 5
-        d(i) = 1.5;
-    end
+---
 
-end
+# 🌪 Disturbance Response
 
-input_signal = u + d;
+![Disturbance Response](screenshots/disturbance_response.png)
 
-[y,t] = lsim(T,input_signal,t);
+---
 
-%% =========================================================
-% DISTURBANCE RESPONSE GRAPH
-%% =========================================================
+# 📊 Root Locus
 
-figure;
-plot(t,y,'LineWidth',2);
+![Root Locus](screenshots/root_locus.png)
 
-grid on;
+---
 
-title('Drone Response with Wind Disturbance');
-xlabel('Time (seconds)');
-ylabel('Altitude');
+# 📉 Bode Plot
 
-%% =========================================================
-% ROOT LOCUS
-%% =========================================================
+![Bode Plot](screenshots/bode_plot.png)
 
-figure;
-rlocus(G);
-grid on;
-title('Root Locus');
+---
 
-%% =========================================================
-% BODE PLOT
-%% =========================================================
+# 🚀 Working Principle
 
-figure;
-bode(G);
-grid on;
-title('Bode Plot');
+1. The desired altitude is provided through a Step Input block.
+2. The feedback system continuously compares desired altitude with actual altitude.
+3. The PID controller calculates the error and adjusts the thrust accordingly.
+4. Wind disturbance is introduced during simulation.
+5. The controller automatically compensates for disturbance and stabilizes the drone altitude.
 
-%% =========================================================
-% POLE ANALYSIS
-%% =========================================================
+---
 
-poles = pole(T);
+# 📂 Project Files
 
-disp(' ')
-disp('===== CLOSED LOOP POLES =====')
-disp(poles)
+| File Name | Description |
+|---|---|
+| create_drone_simulink.m | Automatically generates Simulink model |
+| drone_control.m | MATLAB analysis and graphs |
+| Drone_Altitude_Control.slx | Simulink project file |
+| video_demo.mp4 | Project demonstration video |
 
-%% =========================================================
-% STABILITY CHECK
-%% =========================================================
+---
 
-if all(real(poles) < 0)
+# 📋 Results
 
-    disp(' ')
-    disp('SYSTEM IS STABLE')
+The system successfully:
 
-else
+- Stabilizes drone altitude
+- Minimizes overshoot
+- Reduces settling time
+- Rejects wind disturbance
+- Achieves near-zero steady-state error
 
-    disp(' ')
-    disp('SYSTEM IS UNSTABLE')
+---
 
-end
+# 🔮 Future Improvements
 
-%% =========================================================
-% OPEN SIMULINK MODEL
-%% =========================================================
+- Adaptive PID tuning
+- Real-time sensor integration
+- Hardware implementation
+- Autonomous navigation system
 
-open_system(modelName);
+---
 
-disp(' ')
-disp('CLICK RUN BUTTON INSIDE SIMULINK TO VIEW SCOPE OUTPUT')
+# 👨‍💻 Team Members
+
+- Swati S S
+- Varuni V K
+
+---
+
+# ✅ Conclusion
+
+A PID-based closed-loop control system was successfully designed and implemented for drone altitude stabilization using MATLAB and Simulink. The system effectively maintains stable altitude under external wind disturbance while ensuring good transient and steady-state performance.

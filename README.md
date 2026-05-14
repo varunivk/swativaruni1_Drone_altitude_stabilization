@@ -57,37 +57,19 @@ C(s) = Kp + Ki/s + Kd*s
 ✅ Root Locus Analysis  
 ✅ Bode Plot Analysis  
 ✅ Stability Verification  
-✅ Performance Metrics Analysis
+✅ Performance Metrics Analysis  
+✅ PID Tuning Visualization Animation
 
 ---
-
-# 🖼 Simulink Model
-
-![Simulink Model](screenshots/simulink_model.png)
-
 ---
 
-# 📈 Step Response
+# 🎥 PID Tuning Visualization
 
-![Step Response](screenshots/step_response.png)
+The following animation demonstrates how the drone altitude response changes when PID parameters are varied.
 
----
-
-# 🌪 Disturbance Response
-
-![Disturbance Response](screenshots/disturbance_response.png)
-
----
-
-# 📊 Root Locus
-
-![Root Locus](screenshots/root_locus.png)
-
----
-
-# 📉 Bode Plot
-
-![Bode Plot](screenshots/bode_plot.png)
+- Increase in Kp improves response speed
+- Ki reduces steady-state error
+- Kd improves damping and stability
 
 ---
 
@@ -108,6 +90,7 @@ C(s) = Kp + Ki/s + Kd*s
 | create_drone_simulink.m | Automatically generates Simulink model |
 | drone_control.m | MATLAB analysis and graphs |
 | Drone_Altitude_Control.slx | Simulink project file |
+| PID_Tuning_Visualization.gif | PID tuning animation |
 | video_demo.mp4 | Project demonstration video |
 
 ---
@@ -135,8 +118,8 @@ The system successfully:
 
 # 👨‍💻 Team Members
 
-- Swati S S
 - Varuni V K
+- Swati S S
 
 ---
 
